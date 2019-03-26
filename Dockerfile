@@ -1,9 +1,21 @@
 FROM alpine:3.9
 LABEL Description="Lightweight container with Nginx 1.14 & PHP-FPM 7 based on Alpine Linux."
 
+ENV TIMEZONE Europe/Warsaw
+#ENV TZ "Europe/Warsaw"
+
+# Configuring timezone
+#RUN cp /usr/share/zoneinfo/$TZ /etc/localtime \
+#    && echo "$TZ" >  /etc/timezone
+
+# Installing packages MariaDB
+RUN apk add --no-cache mysql
+RUN addgroup mysql mysql
+
 # Install packages
 RUN apk --no-cache add php7 php7-fpm php7-mysqli php7-json php7-openssl php7-curl \
     php7-zlib php7-xml php7-phar php7-intl php7-dom php7-xmlreader php7-ctype \
+    php7-pdo php7-pdo_mysql php7-mbstring php7-tokenizer \
     php7-mbstring php7-gd nginx supervisor curl
 
 # Configure nginx

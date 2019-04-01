@@ -20,12 +20,19 @@ RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get -y install apt-utils supervisor nginx php7.0-fpm php7.0-mysql pwgen python-setuptools curl git unzip cron anacron rsyslog memcached mysql-server mysql-client && \
     apt-get -y install php7.0-curl php7.0-gd php7.0-intl php-pear php-imagick php7.0-imap php7.0-mcrypt php-memcache php7.0-ps php7.0-pspell php7.0-recode php7.0-sqlite php7.0-tidy php7.0-xmlrpc php7.0-xsl && \
+    apt-get -y install php7.0-mbstring php7.0-tokenizer php7.0-openssl php7.0-pdo php7.0-pdo_mysql && \
     apt-get clean && \
     rm -rf /var/lib/mysql && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/* && \
     rm -f /etc/memcached.conf && \
     rm -rf /var/www && \
+    
+    # install composer
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    mv composer.phar /usr/local/bin/composer && \
 
     # fix container bug for syslog, by disabling: emerg and imklog
     sed -i 's/\$KLogPermitNonKernelFacility/#$KLogPermitNonKernelFacility/g' /etc/rsyslog.conf && \
@@ -55,7 +62,6 @@ RUN apt-get update && \
     sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" /etc/php/7.0/fpm/pool.d/www.conf && \
     find /etc/php/7.0/cli/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
 
-
 ##################################################################
 # copy files
 COPY supervisord/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -67,6 +73,18 @@ COPY nginx/site-git.conf /root/nginx/site-git.conf
 COPY nginx/phpinfo.php /root/nginx/phpinfo.php
 COPY nginx/nginx.conf /root/nginx/nginx.conf
 COPY nginx/logrotate /etc/logrotate.d/nginx
+
+# clone the Connfa! repo into the docker container
+# $INSTALL_DIR= /data/var/www/html/public_html
+COPY .env /data/var/www/html/public_html
+ADD https://github.com/lemberg/connfa-integration-server/archive/master.zip /tmp
+RUN unzip /tmp/master.zip connfa-integration-server-master/* -d /data/var/www/html/public_html && \
+    mv /data/var/www/html/public_html/connfa-integration-server-master/* /data/var/www/html/public_html && \
+    rm -rf /data/var/www/html/public_html/connfa-integration-server-master && \
+    rm /tmp/master.zip
+
+# install dependencies
+RUN composer update
 
 ##################################################################
 # ports

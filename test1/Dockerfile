@@ -20,7 +20,7 @@ RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get -y install apt-utils supervisor nginx php7.0-fpm php7.0-mysql pwgen python-setuptools curl git unzip cron anacron rsyslog memcached mysql-server mysql-client && \
     apt-get -y install php7.0-curl php7.0-gd php7.0-intl php-pear php-imagick php7.0-imap php7.0-mcrypt php-memcache php7.0-ps php7.0-pspell php7.0-recode php7.0-sqlite php7.0-tidy php7.0-xmlrpc php7.0-xsl && \
-    apt-get -y install php7.0-mbstring php7.0-tokenizer php7.0-openssl php7.0-pdo php7.0-pdo_mysql && \
+    apt-get -y install php7.0-mbstring php7.0-tokenizer php7-openssl php7-pdo php7-pdo_mysql && \
     apt-get clean && \
     rm -rf /var/lib/mysql && \
     rm -rf /var/lib/apt/lists/* && \
@@ -81,8 +81,8 @@ ADD https://github.com/lemberg/connfa-integration-server/archive/master.zip /tmp
 RUN unzip /tmp/master.zip connfa-integration-server-master/* -d /data/var/www/html/public_html && \
     mv /data/var/www/html/public_html/connfa-integration-server-master/* /data/var/www/html/public_html && \
     rm -rf /data/var/www/html/public_html/connfa-integration-server-master && \
-    rm /tmp/master.zip
-
+    rm /tmp/master.zip \
+    
 # install dependencies
 RUN composer update
 

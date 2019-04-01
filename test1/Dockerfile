@@ -1,5 +1,9 @@
 FROM ubuntu:16.04
 
+##################################################################
+# CREDITS
+# https://github.com/robinostlund/docker-nginx-php-mysql-static
+
 
 ##################################################################
 # avoid debconf and initrd
